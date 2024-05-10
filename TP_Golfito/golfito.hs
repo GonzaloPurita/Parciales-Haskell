@@ -13,7 +13,7 @@ hab1 :: Habilidad
 hab1 = Habilidad{fuerzaJugador=10, precisionJugador=25}
 
 bart :: Jugador
-bart = UnJugador "Bart" "Homero" (Habilidad 25 60)
+bart = UnJugador "Bart" "Homero" (Habilidad 50 60)
 todd :: Jugador
 todd = UnJugador "Todd" "Ned" (Habilidad 15 80)
 rafa :: Jugador
@@ -55,33 +55,59 @@ palos = [putter, madera, hierro 1, hierro 2, hierro 3, hierro 4, hierro 5, hierr
 golpe :: Jugador -> Palo -> Tiro
 golpe player palo = (palo.habilidad) player
 
-type Obstaculo = Tiro -> Bool
-
 tiro1 :: Tiro
-tiro1 = UnTiro 100 50 6
+tiro1 = UnTiro 10 95 0
+
+data Obstaculo = UnObstaculo{
+  condicion :: Tiro -> Bool,
+  postObs :: Tiro -> Tiro
+}
+
+tiroDetenido :: Tiro
+tiroDetenido = UnTiro 0 0 0
+
+superarObstaculo :: Obstaculo -> Tiro -> Tiro
+superarObstaculo obs tiro = (postObs obs) tiro
 
 tunel :: Obstaculo
-tunel tiro = precision tiro > 90 && altura tiro == 0
-laguna :: Obstaculo
-laguna tiro = velocidad tiro > 80 && altura tiro `elem` [1,2,3,4,5]
-hoyo :: Obstaculo
-hoyo tiro = velocidad tiro `elem` [5 .. 20] && altura tiro == 0 && precision tiro > 95
-
+tunel = UnObstaculo{condicion = \tiro -> precision tiro > 90 && altura tiro == 0, postObs = superarTunel}
 superarTunel :: Tiro -> Tiro
 superarTunel tiro
-            | tunel tiro = UnTiro (velocidad tiro *2) 100 0
-            | otherwise = UnTiro 0 0 0 
+        | condicion tunel tiro = UnTiro (velocidad tiro *2) 100 0
+        | otherwise = tiroDetenido
 
-superarLaguna :: Tiro -> Int -> Tiro
-superarLaguna tiro largo
-                    | laguna tiro = tiro{altura = altura tiro `div` largo}
-                    | otherwise = UnTiro 0 0 0 
+laguna :: Int -> Obstaculo
+laguna num = UnObstaculo{condicion = \tiro -> velocidad tiro > 80 && altura tiro `elem` [1,2,3,4,5], postObs = superarLaguna num}
+superarLaguna :: Int -> Tiro -> Tiro
+superarLaguna largo tiro
+                | condicion (laguna largo) tiro = tiro{altura = altura tiro `div` largo}
+                | otherwise = tiroDetenido
 
+hoyo :: Obstaculo
+hoyo = UnObstaculo{condicion = \tiro -> velocidad tiro `elem` [5 .. 20] && altura tiro == 0 && precision tiro > 95, postObs = superarHoyo}
 superarHoyo :: Tiro -> Tiro
-superarHoyo tiro = tiro{velocidad=0, precision=0, altura=0}
+superarHoyo tiro = tiroDetenido
 
+--PARTE 4 
+palosUtiles :: Jugador -> Obstaculo -> [Palo]
+palosUtiles player obstaculo = filter (filtradoDePalos player obstaculo) palos
 
+filtradoDePalos :: Jugador -> Obstaculo -> Palo -> Bool
+-- filtradoDePalos player obstaculo palo = superarObstaculo obstaculo (palo (habilidad player)) /= tiroDetenido
+filtradoDePalos player obstaculo palo = condicion obstaculo (palo (habilidad player))
 
+obstaculosSuperados :: [Obstaculo] -> Tiro -> Int
+-- obstaculosSuperados [] _ = 0
+-- obstaculosSuperados (obs:obstaculos) tiro
+--                           | condicion obs tiro = 1 + obstaculosSuperados obstaculos tiro
+--                           | otherwise = 0
+obstaculosSuperados listaObs tiro = length (takeWhile (`condicion` tiro) listaObs)
 
+paloMasUtil :: Jugador -> [Obstaculo] -> Palo
+paloMasUtil player listaObs = foldl1 (f player listaObs) palos
 
+f :: Jugador -> [Obstaculo] -> Palo -> Palo -> Palo
+f player lista palo1 palo2
+                | obstaculosSuperados lista (palo1 (habilidad player)) >= obstaculosSuperados lista (palo2 (habilidad player)) = palo1
+                | otherwise = palo2
 
