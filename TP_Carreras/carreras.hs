@@ -97,5 +97,12 @@ encontrarAutoUsandoColor nombreColor (auto:restoDeAutos)
 --PARTE 5 a)
 -- Si se quisiera agregar un nuevo power up, un misil teledirigido, que para poder activarlo se deba indicar el color del auto al que se quiere impactar
 -- se podria agregar con lo hecho hasta ahora?
+-- La respuesta es si: usando el evento usaPowerUp, primero encuentro el auto con el color propuesto y despues le aplico el debuff
 
--- misilTeledirigido :: Color -> 
+-- misilTeledirigido :: PowerUp
+-- misilTeledirigido auto carrera = afectarALosQueCumplen (auto==) (bajarVelocidad 100) carrera
+
+--PARTE 5 b)
+-- Si hubiese una lista de auto infinita, sepodrian usar las funciones autoTranquilo y puestoAuto?
+-- autoTranquilo no se podria usar primero porque la funcion maximum jamas terminaria de encontrar la mayor distancia. Excluyendo ese hecho, tmp terminaria si la lista tuviera autos que continuamente estuvieran alejados unos de otros
+-- puestoAuto no se podria usar tampoco porque no hay forma de saber el length de la lista
