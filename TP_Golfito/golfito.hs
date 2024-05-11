@@ -13,7 +13,7 @@ hab1 :: Habilidad
 hab1 = Habilidad{fuerzaJugador=10, precisionJugador=25}
 
 bart :: Jugador
-bart = UnJugador "Bart" "Homero" (Habilidad 50 60)
+bart = UnJugador "Bart" "Homero" (Habilidad 25 60)
 todd :: Jugador
 todd = UnJugador "Todd" "Ned" (Habilidad 15 80)
 rafa :: Jugador
@@ -104,10 +104,22 @@ obstaculosSuperados :: [Obstaculo] -> Tiro -> Int
 obstaculosSuperados listaObs tiro = length (takeWhile (`condicion` tiro) listaObs)
 
 paloMasUtil :: Jugador -> [Obstaculo] -> Palo
-paloMasUtil player listaObs = foldl1 (f player listaObs) palos
+paloMasUtil player listaObs = foldl1 (comparacionPalos player listaObs) palos
 
-f :: Jugador -> [Obstaculo] -> Palo -> Palo -> Palo
-f player lista palo1 palo2
+comparacionPalos :: Jugador -> [Obstaculo] -> Palo -> Palo -> Palo
+comparacionPalos player lista palo1 palo2
                 | obstaculosSuperados lista (palo1 (habilidad player)) >= obstaculosSuperados lista (palo2 (habilidad player)) = palo1
                 | otherwise = palo2
 
+perdedores :: [(Jugador, Puntos)] -> [(Jugador, Puntos)]
+perdedores lista = filter (\tupla -> snd tupla /= snd (ganador lista)) lista
+
+listaPadresPerdedores :: [(Jugador, Puntos)] -> [String]
+listaPadresPerdedores lista = map (padre.fst) (perdedores lista)
+
+ganador :: [(Jugador, Puntos)] -> (Jugador, Puntos)
+ganador = foldl1 comparacion
+comparacion :: (Jugador, Puntos) -> (Jugador, Puntos) -> (Jugador, Puntos)
+comparacion tupla1 tupla2
+            | snd tupla1 >= snd tupla2 = tupla1
+            | otherwise = tupla2
