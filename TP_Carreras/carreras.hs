@@ -1,3 +1,4 @@
+
 data Auto = UnAuto{
     color :: String,
     velocidad :: Int,
@@ -21,11 +22,12 @@ autoTranquilo :: Auto -> Carrera -> Bool
 autoTranquilo auto lista = not (any (autoCercaDeOtro auto) lista) && distancia auto > maximum (map distancia lista)
 
 puestoAuto :: Auto -> Carrera -> Int
--- puestoAuto auto autos = 1 + length (filter (leVanGanando auto) autos)
-puestoAuto auto = (+1).(length.filter (leVanGanando auto))
+puestoAuto auto autos = 1 + length (filter (not.vaGanando auto) autos)
+--puestoAuto auto carrera = (+1).(length.filter (not.vaGanando auto)) carrera
 
-leVanGanando :: Auto -> Auto -> Bool
-leVanGanando autoA = (distancia autoA <).distancia
+vaGanando :: Auto -> Auto -> Bool
+--vaGanando autoA = (distancia autoA >).distancia
+vaGanando autoA autoB = distancia autoA > distancia autoB
 
 --PARTE 2
 
@@ -43,4 +45,21 @@ bajarVelocidad cant auto = alterarVelocidad auto (\vel -> vel - cant)
 
 --PARTE 3
 
+type PowerUp = Auto -> Carrera -> Carrera
+
+afectarALosQueCumplen :: (a -> Bool) -> (a -> a) -> [a] -> [a]
+afectarALosQueCumplen criterio efecto lista = (map efecto . filter criterio) lista ++ filter (not.criterio) lista
+
+terremoto :: PowerUp
+terremoto auto = afectarALosQueCumplen (autoCercaDeOtro auto) (bajarVelocidad 50)
+
+miguelitos :: Int -> PowerUp
+miguelitos num auto = afectarALosQueCumplen (vaGanando auto) (bajarVelocidad num)
+
+--En jetPack, el auto original si esta dentro de la lista
+jetPack :: Int -> PowerUp
+jetPack tiempo auto = afectarALosQueCumplen (auto==) (modificacionAuto tiempo)
+
+modificacionAuto :: Int -> Auto -> Auto
+modificacionAuto tiempo auto = (autoCorra tiempo (alterarVelocidad auto (*2))) {velocidad = velocidad auto}
 
