@@ -132,10 +132,11 @@ type Jurado = [(Escena -> Bool, Float)]
 alToke :: Jurado
 alToke = [(aabb . estrofaArtista, 0.5), (combinaDos esdrujula (simple 1 4) . estrofaArtista, 1), (publicoExaltado , 1), ((1.5<) . potencia, 2)]
 
-sumaPuntosJurado :: Escena -> Jurado -> Float
-sumaPuntosJurado escena (criterio:restoCriterios)
-                    | (fst criterio) escena = min 3 (snd criterio + sumaPuntosJurado escena restoCriterios)
-                    | otherwise = sumaPuntosJurado escena restoCriterios
+sumaPuntosJurado :: Jurado -> Escena -> Float
+sumaPuntosJurado [] _ = 0
+sumaPuntosJurado (criterio:restoCriterios) escena
+                    | (fst criterio) escena = min 3 (snd criterio + sumaPuntosJurado restoCriterios escena)
+                    | otherwise = sumaPuntosJurado restoCriterios escena
 
 --BONUS
 
@@ -143,6 +144,9 @@ data Batalla = UnaBatalla{
     puestaEnEscena1 :: [Escena],
     puestaEnEscena2 :: [Escena]
 }deriving(Show,Eq)
+
+sumaTotalPuntosJurado :: Batalla -> Jurado -> Float
+sumaTotalPuntosJurado batalla (jurado:restoJurados) = foldl (\acc escena -> sumaPuntosJurado acc escena) jurado (puestaEnEscena1 batalla)
 
 -- cintoACasa :: Batalla -> [Jurado] -> Artista
 -- cintoACasa batalla listaJurados
