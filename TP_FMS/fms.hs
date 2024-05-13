@@ -132,25 +132,24 @@ type Jurado = [(Escena -> Bool, Float)]
 alToke :: Jurado
 alToke = [(aabb . estrofaArtista, 0.5), (combinaDos esdrujula (simple 1 4) . estrofaArtista, 1), (publicoExaltado , 1), ((1.5<) . potencia, 2)]
 
-sumaPuntosJurado :: Jurado -> Escena -> Float
-sumaPuntosJurado [] _ = 0
-sumaPuntosJurado (criterio:restoCriterios) escena
-                    | (fst criterio) escena = min 3 (snd criterio + sumaPuntosJurado restoCriterios escena)
-                    | otherwise = sumaPuntosJurado restoCriterios escena
+sumaPuntosJurado :: Escena -> Jurado -> Float
+sumaPuntosJurado _ [] = 0
+sumaPuntosJurado escena (criterio:restoCriterios)
+                    | (fst criterio) escena = min 3 (snd criterio + sumaPuntosJurado escena restoCriterios)
+                    | otherwise = sumaPuntosJurado escena restoCriterios
 
 --BONUS
 
-data Batalla = UnaBatalla{
-    puestaEnEscena1 :: [Escena],
-    puestaEnEscena2 :: [Escena]
-}deriving(Show,Eq)
+type Batalla = [(Escena, Escena)]
 
-sumaTotalPuntosJurado :: Batalla -> Jurado -> Float
-sumaTotalPuntosJurado batalla (jurado:restoJurados) = foldl (\acc escena -> sumaPuntosJurado acc escena) jurado (puestaEnEscena1 batalla)
+ganadorCinto :: Batalla -> [Jurado] -> Artista
+ganadorCinto batalla listaJurados
+                | sum (map (sumaPuntosJuradoTotal1 listaJurados) batalla) >= sum (map (sumaPuntosJuradoTotal2 listaJurados) batalla) = artista (fst (head batalla))
+                | otherwise = artista (snd (head batalla))
 
--- cintoACasa :: Batalla -> [Jurado] -> Artista
--- cintoACasa batalla listaJurados
---                 | sumatoriaPuntos1 (puestaEnEscena1 batalla) listaJurados = 
+-- map (sumaPuntosJuradoTotal1 listaJurados) batalla   -->  este map me devuelve una lista con todas las sumas de de los jurados, cada posicion es una escena
 
--- sumatoriaPuntos1 :: [Escena] -> [Jurado] -> Float
--- sumatoriaPuntos1 escenas jurados = 
+sumaPuntosJuradoTotal1 :: [Jurado] -> (Escena, Escena) -> Float
+sumaPuntosJuradoTotal1 listaJurados tuplaEscena = sum (map (sumaPuntosJurado (fst tuplaEscena)) listaJurados) --Suma de los puntos de todos los jurados sobre esa escena
+sumaPuntosJuradoTotal2 :: [Jurado] -> (Escena, Escena) -> Float
+sumaPuntosJuradoTotal2 listaJurados tuplaEscena = sum (map (sumaPuntosJurado (snd tuplaEscena)) listaJurados)
