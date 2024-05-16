@@ -23,7 +23,7 @@ auto5 = UnAuto "negro" 50 5
 --PARTE 1
 
 autoTranquilo :: Auto -> Carrera -> Bool
-autoTranquilo auto lista = not (any (autoCercaDeOtro auto) lista) && distancia auto > maximum (map distancia lista)
+autoTranquilo auto carrera = not (any (autoCercaDeOtro auto) carrera) && distancia auto > maximum (map distancia carrera)
 
 puestoAuto :: Carrera -> Auto -> Int
 puestoAuto autos auto = 1 + length (filter (not.vaGanando auto) autos)
@@ -103,6 +103,6 @@ encontrarAutoUsandoColor nombreColor (auto:restoDeAutos)
 -- misilTeledirigido auto carrera = afectarALosQueCumplen (auto==) (bajarVelocidad 100) carrera
 
 --PARTE 5 b)
--- Si hubiese una lista de auto infinita, sepodrian usar las funciones autoTranquilo y puestoAuto?
+-- Si hubiese una lista de autos infinita, sepodrian usar las funciones autoTranquilo y puestoAuto?
 -- autoTranquilo no se podria usar primero porque la funcion maximum jamas terminaria de encontrar la mayor distancia. Excluyendo ese hecho, tmp terminaria si la lista tuviera autos que continuamente estuvieran alejados unos de otros
 -- puestoAuto no se podria usar tampoco porque no hay forma de saber el length de la lista
