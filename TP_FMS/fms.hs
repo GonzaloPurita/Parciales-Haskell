@@ -125,7 +125,7 @@ tirarTecnicas patron escena
 -- data Jurado = UnJurado{
 --     condicion :: [Escena -> Bool],
 --     puntaje :: Int
--- }deriving(Show,Eq)
+-- }
 
 type Jurado = [(Escena -> Bool, Float)]
 
@@ -140,7 +140,7 @@ sumaPuntosJurado escena (criterio:restoCriterios)
 
 --BONUS
 
-type Batalla = [(Escena, Escena)]
+type Batalla = [(Escena, Escena)] -- (EscenaDePrimerArtista, EscenaDeSegundoArtista)
 
 ganadorCinto :: Batalla -> [Jurado] -> Artista
 ganadorCinto batalla listaJurados
