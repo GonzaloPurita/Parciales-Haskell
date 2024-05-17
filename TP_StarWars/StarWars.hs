@@ -21,7 +21,7 @@ vader = UnaNave "Nave de Darth Vader" 500 300 200 superTurbo
 superTurbo :: Nave -> Nave
 superTurbo = hacerNVeces 3 turbo.reducirDurabilidad 45     -- (\nave -> nave{durabilidad = max (durabilidad nave) (durabilidad nave - 45)})
 reducirDurabilidad :: Int -> Nave -> Nave
-reducirDurabilidad num nave = nave{durabilidad = max (durabilidad nave) (durabilidad nave - num)}
+reducirDurabilidad num nave = nave{durabilidad = max 0 (durabilidad nave - num)}
 
 hacerNVeces :: Int -> (a -> a) -> a -> a
 hacerNVeces 0 f valor = valor
@@ -42,7 +42,7 @@ durabilidadTotal = sum . map durabilidad
 --PARTE 3
 
 naveEsAtacada :: Nave -> Nave -> Nave
-naveEsAtacada naveAtacada naveAtacante = reducirDurabilidad (max 0 (ataque naveAtacante - escudo naveAtacada)) (poder naveAtacada naveAtacada)
+naveEsAtacada naveAtacada naveAtacante = reducirDurabilidad (max 0 (ataque (poder naveAtacante naveAtacante) - escudo (poder naveAtacada naveAtacada))) (poder naveAtacada naveAtacada)
 
 fueraDeCombate :: Nave -> Bool
 fueraDeCombate = (0==) . durabilidad
