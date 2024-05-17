@@ -1,3 +1,4 @@
+
 data Ley = UnaLey{
     tema :: String,
     presupuesto :: Int,
@@ -14,4 +15,11 @@ tenis :: Ley
 tenis = UnaLey "tenis" 2 ["liga de deportistas autónomos"]
 
 leyesCompatibles :: Ley -> Ley -> String
-leyesCompatibles ley1 ley2 = {-- any (`elem` sectoresApoyan ley1) (sectoresApoyan ley2) && --} dropWhile (\c -> c `elem` "tenis") (tema ley1)
+leyesCompatibles ley1 ley2 = {-- any (`elem` sectoresApoyan ley1) (sectoresApoyan ley2) && --} temaPerteneceAOtro (tema ley1) (tema ley2)    -- filter (\c -> c `elem` tema ley1) (tema ley2)
+
+temaPerteneceAOtro :: String -> String -> Bool
+temaPerteneceAOtro _ [] = False
+temaPerteneceAOtro [] _ = True
+temaPerteneceAOtro (x:strABuscar) (c:str)
+                    | x == c = 
+                    | otherwise = 
