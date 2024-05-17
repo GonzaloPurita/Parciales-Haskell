@@ -32,7 +32,7 @@ estanListos :: [Postre] -> Hechizo -> Bool
 estanListos postres hechizo = all (verificarSiEstanListos.hechizo) postres
 
 verificarSiEstanListos :: Postre -> Bool
-verificarSiEstanListos postre = peso postre > 0 && not (null (sabores postre)) && temperatura postre > 0
+verificarSiEstanListos postre = peso postre > 0 && (not.null.sabores) postre && temperatura postre > 0
 
 pesoPromedio :: [Postre] -> Float
 pesoPromedio postres = sum (map peso (filter verificarSiEstanListos postres)) / fromIntegral (length (filter verificarSiEstanListos postres)) :: Float
