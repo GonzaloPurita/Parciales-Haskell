@@ -5,16 +5,17 @@ data Pokemon = UnPokemon {
 }deriving (Show, Eq)
 
 data TipoPokemon = Tipo{
-    fuerteContra :: TipoPokemon,
-    debilContra :: TipoPokemon
+    propio :: String,
+    fuerteContra :: String,
+    debilContra :: String
 }deriving(Show,Eq)
 
 planta :: TipoPokemon
-planta = Tipo agua fuego
+planta = Tipo "planta" "agua" "fuego"
 agua :: TipoPokemon
-agua = Tipo fuego planta
+agua = Tipo "agua" "fuego" "planta"
 fuego :: TipoPokemon
-fuego = Tipo planta agua
+fuego = Tipo "fuego" "planta" "agua"
 
 charmander :: Pokemon
 charmander = UnPokemon "Charmander" fuego
@@ -39,7 +40,7 @@ aCualesLeGana :: Pokemon -> [Pokemon] -> [Pokemon]
 aCualesLeGana pokemon = filter (pelea pokemon)
 
 pelea :: Pokemon -> Pokemon -> Bool
-pelea pokeAtacante pokeRecibe = fuerteContra (tipo pokeAtacante) == debilContra (tipo pokeRecibe)
+pelea pokeAtacante pokeRecibe = fuerteContra (tipo pokeAtacante) == propio (tipo pokeRecibe)
 
 -- 2)
 aCuantosLeGana :: Pokemon -> [Pokemon] -> Int
@@ -61,13 +62,31 @@ quienGana poke1 poke2
             | otherwise = poke2
 
 -- 4)
-data Destino = UnGimnasio {nombreGym :: String, siguiente :: Destino} | UnaLiga {contrincantes :: [Pokemon]}
-ej :: Destino
-ej = UnGimnasio "si" ej
+data Destino = UnGimnasio {nombreGym :: String, siguiente :: Destino} | UnaLiga {contrincantes :: [Pokemon]} deriving(Show,Eq)
 ligaKanto :: Destino
 ligaKanto = UnaLiga [gyarados, carpinchos, squirtle]
+ligaGali :: Destino
+ligaGali = UnaLiga [charmander, bulbasur, oddish]
 
 estaAlHorno :: Pokemon -> Destino -> Bool
 estaAlHorno _ (UnGimnasio _ _) = True
 estaAlHorno pokemon liga = aCuantosLeGana pokemon (contrincantes liga) == 0
+
+-- 5)
+gymRoca :: Destino
+gymRoca = UnGimnasio "Gimnasio tipo Roca" gymAgua
+gymAgua :: Destino
+gymAgua = UnGimnasio "Gimnasio tipo Agua" gymElectrico
+gymElectrico :: Destino
+gymElectrico = UnGimnasio "Gimnasio tipo Electrico" ligaKanto
+gymFuego :: Destino
+gymFuego = UnGimnasio "Gimnasio tipo Fuego" gymPlanta
+gymPlanta :: Destino
+gymPlanta = UnGimnasio "Gimnasio tipo Planta" ligaGali
+
+puedoViajar :: Destino -> Destino -> Bool
+puedoViajar (UnaLiga _) _ = False
+puedoViajar destinoOrigen destinoALlegar
+              | siguiente destinoOrigen == destinoALlegar = True
+              | otherwise = puedoViajar (siguiente destinoOrigen) destinoALlegar
 
